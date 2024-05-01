@@ -1,10 +1,8 @@
 <?php
-    class Home {
+    class Home extends Controller {
         public function index() {
-            echo "Dashboard";
+             $this->view('home');
         }
-        public function get(){
-            echo "Get";
-        }
+
 }
 
