@@ -11,7 +11,7 @@
 
 <div class="container mt-5">
     <h2>Add New Task</h2>
-    <form id="addTaskForm" onsubmit="return validateForm()">
+    <form id="addTaskForm" onsubmit="return validateForm()" action="/task-management/task/addTask" method="post">
         <div class="form-group">
             <label for="taskName">Task Name</label>
             <input type="text" class="form-control" id="taskName" name="taskName" required>

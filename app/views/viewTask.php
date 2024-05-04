@@ -48,9 +48,8 @@
                         <td><?= htmlspecialchars($task['category_id']); ?></td>
                         <td>
                             <div class="d-flex justify-content-between align-items-center">
-                                <!-- Added me-3 to add space on the right side of the Edit button -->
-                                <a href="/task-management/task/editTask/<?= $task['id']; ?>" class="btn btn-primary btn-sm me-3">Edit</a>
-                                <button type="button" onclick="deleteTask(<?= $task['id']; ?>)" class="btn btn-danger btn-sm">Delete</button>
+                                <a href="/task-management/task/editTask/<?= $task['id']; ?>" class="btn btn-primary btn-sm me-5">Edit</a>
+                                <button type="button" onclick="deleteTask(<?= htmlspecialchars($task['id']); ?>)" class="btn btn-danger btn-sm">Delete</button>
                             </div>
                         </td>
 
@@ -59,7 +58,10 @@
                 <?php endforeach; ?>
             </tbody>
         </table>
-        <button type="button" onclick="deleteSelectedTasks()" class="btn btn-danger">Delete Selected</button>
+        <div class="d-flex justify-content-between align-items-center">
+            <button type="button" onclick="deleteSelectedTasks()" class="btn btn-danger">Delete Selected</button>
+            <a href="/task-management/task/addTask" class="btn btn-primary ">Add New Task</a>
+        </div>
     </form>
 </div>
 
@@ -89,7 +91,9 @@ function searchTasks() {
         }       
     }
 }
+</script>
 
+<script>
 // Select All Tasks Function
 function selectAllTasks(source) {
     checkboxes = document.getElementsByClassName('taskCheckbox');
@@ -98,67 +102,72 @@ function selectAllTasks(source) {
     }
 }
 
+</script>
+
+<script>
 // Delete Task Function
 function deleteTask(taskId) {
+    console.log("Delete function called for task ID:", taskId);
+
     if (!confirm('Are you sure you want to delete this task?')) return;
 
     fetch(`/task-management/task/delete/${taskId}`, {
-        method: 'POST', // Assuming your backend looks for POST requests
+        method: 'DELETE',
         headers: {
             'Content-Type': 'application/json',
-            // 'X-CSRF-Token': csrfToken // include this if you need to handle CSRF protection
-        },
-        body: JSON.stringify({ id: taskId })
+        }
     })
     .then(response => {
+        console.log("Response status:", response.status);
         if (!response.ok) {
-            throw new Error('Network response was not ok');
+            throw new Error(`Network response was not ok, status: ${response.status}`);
         }
-        return response.json(); // Or 'response.text()' if the response is not JSON
+        return response.json();
     })
     .then(data => {
-        // This is where you would handle a successful response
-        window.location.reload(); // or redirect to the task list
+        console.log("Response data:", data);
+        window.location.reload();
     })
     .catch(error => {
-        // Handle any errors here
-        console.error('Error:', error);
+        console.error("Error:", error);
     });
 }
+</script>
 
-// Delete Selected Tasks Function
+<script>
 function deleteSelectedTasks() {
     let selectedTasks = document.querySelectorAll('.taskCheckbox:checked');
     let taskIds = Array.from(selectedTasks).map(checkbox => checkbox.value);
 
-    if (taskIds.length === 0 || !confirm('Are you sure you want to delete the selected tasks?')) return;
+    if (taskIds.length === 0) {
+        alert('Please select at least one task to delete.');
+        return;
+    }
+
+    if (!confirm('Are you sure you want to delete the selected tasks?')) return;
 
     fetch(`/task-management/task/deleteMultiple`, {
-        method: 'POST', // Again, assuming your backend looks for POST requests
+        method: 'DELETE',
         headers: {
             'Content-Type': 'application/json',
-            // 'X-CSRF-Token': csrfToken // include this if you need to handle CSRF protection
         },
         body: JSON.stringify({ ids: taskIds })
     })
     .then(response => {
         if (!response.ok) {
-            throw new Error('Network response was not ok');
+            throw new Error(`Network response was not ok, status: ${response.status}`);
         }
-        return response.json(); // Or 'response.text()' if the response is not JSON
+        return response.json();
     })
     .then(data => {
-        // This is where you would handle a successful response
-        window.location.reload(); // or redirect to the task list
+        console.log("Deletion successful, server response:", data);
+        window.location.reload();
     })
     .catch(error => {
-        // Handle any errors here
-        console.error('Error:', error);
+        console.error('Deletion error:', error.message);
     });
 }
-
-
 </script>
 
-</body>
-</html>
+
+
